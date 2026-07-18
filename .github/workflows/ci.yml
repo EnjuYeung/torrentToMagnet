@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Test and build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24.17.0
+          cache: npm
+
+      - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+        run: npm ci --no-audit --no-fund
+
+      - name: Run checks
+        run: npm run check
+
+  container:
+    name: Container and browser smoke tests
+    needs: quality
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24.17.0
+          cache: npm
+
+      - name: Install test dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+        run: npm ci --no-audit --no-fund
+
+      - name: Build image
+        run: docker build --tag torrent-to-magnet:test .
+
+      - name: Start hardened container
+        run: >-
+          docker run --detach --name torrent-to-magnet-test
+          --read-only --tmpfs /tmp:size=16m,mode=1777
+          --cap-drop ALL --security-opt no-new-privileges
+          --publish 127.0.0.1:8080:8080 torrent-to-magnet:test
+
+      - name: Verify container and response policy
+        run: |
+          cleanup() {
+            docker logs torrent-to-magnet-test || true
+            docker rm --force torrent-to-magnet-test || true
+          }
+          trap cleanup EXIT
+
+          for attempt in $(seq 1 30); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' torrent-to-magnet-test)
+            if [ "$status" = "healthy" ]; then
+              break
+            fi
+            if [ "$status" = "unhealthy" ]; then
+              exit 1
+            fi
+            sleep 1
+          done
+
+          test "$(docker inspect --format '{{.State.Health.Status}}' torrent-to-magnet-test)" = "healthy"
+          test "$(docker inspect --format '{{.Config.User}}' torrent-to-magnet-test)" = "101:101"
+          test "$(docker exec torrent-to-magnet-test id -u)" != "0"
+          curl --fail --silent --show-error http://127.0.0.1:8080/healthz | grep --fixed-strings "ok"
+          curl --fail --silent --show-error http://127.0.0.1:8080/ | grep --fixed-strings "torrentToMagnet"
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8080/assets/not-found.js)" = "404"
+
+          curl --fail --silent --show-error --head http://127.0.0.1:8080/ > /tmp/torrent-to-magnet-headers
+          grep --ignore-case '^cache-control: no-store' /tmp/torrent-to-magnet-headers
+          grep --ignore-case "^content-security-policy:.*default-src 'none'" /tmp/torrent-to-magnet-headers
+          grep --ignore-case "^content-security-policy:.*connect-src 'none'" /tmp/torrent-to-magnet-headers
+          grep --ignore-case "^content-security-policy:.*frame-ancestors 'none'" /tmp/torrent-to-magnet-headers
+          grep --ignore-case '^permissions-policy:' /tmp/torrent-to-magnet-headers
+          grep --ignore-case '^referrer-policy: no-referrer' /tmp/torrent-to-magnet-headers
+          grep --ignore-case '^x-content-type-options: nosniff' /tmp/torrent-to-magnet-headers
+          grep --ignore-case '^x-frame-options: DENY' /tmp/torrent-to-magnet-headers
+
+          PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080 npm run test:e2e
+
+  compose:
+    name: Validate Compose configuration
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Validate Compose file
+        run: docker compose config --quiet

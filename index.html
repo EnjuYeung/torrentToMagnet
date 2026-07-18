@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="完全在浏览器本地将 .torrent 种子文件转换为 v1、v2 或 Hybrid 磁力链接。"
+    />
+    <meta name="theme-color" content="#f8fafc" />
+    <title>torrentToMagnet · 种子转磁力链接</title>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header" aria-label="网站导航">
+        <a class="brand" href="/" aria-label="torrentToMagnet 首页">
+          <span class="brand-mark" aria-hidden="true">TM</span>
+          <span>torrentToMagnet</span>
+        </a>
+        <a
+          class="source-link"
+          href="https://github.com/EnjuYeung/torrentToMagnet"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          查看源码 <span aria-hidden="true">↗</span>
+        </a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <div class="local-badge"><span aria-hidden="true"></span> 完全本地处理</div>
+          <h1 id="page-title">把种子文件，<br /><span>变成磁力链接</span></h1>
+          <p>无需上传，所有解析与哈希计算都在你的浏览器中完成。</p>
+          <ul class="feature-list" aria-label="主要特性">
+            <li>文件不离开设备</li>
+            <li>支持 v1 / v2 / Hybrid</li>
+            <li>无需安装</li>
+          </ul>
+        </section>
+
+        <section
+          id="converter-card"
+          class="converter-card"
+          aria-labelledby="converter-title"
+          aria-busy="false"
+        >
+          <h2 id="converter-title" class="visually-hidden">种子文件转换器</h2>
+
+          <div id="error-banner" class="error-banner" role="alert" hidden>
+            <span class="error-icon" aria-hidden="true">!</span>
+            <div>
+              <strong>无法解析这个文件</strong>
+              <p id="error-message">它可能不是有效的 .torrent 文件，或文件内容已损坏。</p>
+            </div>
+          </div>
+
+          <div id="upload-view">
+            <label
+              id="drop-zone"
+              class="drop-zone"
+              for="torrent-file"
+            >
+              <input
+                id="torrent-file"
+                class="visually-hidden"
+                type="file"
+                accept=".torrent,application/x-bittorrent"
+                aria-label="选择种子文件"
+                aria-describedby="upload-description upload-limit"
+              />
+              <span class="upload-symbol" aria-hidden="true">↑</span>
+              <strong id="drop-title">拖入 .torrent 文件</strong>
+              <span id="upload-description" class="upload-description">或点击选择文件</span>
+              <span class="button button-primary upload-button" aria-hidden="true">选择种子文件</span>
+              <small id="upload-limit">仅支持 .torrent，单个文件不超过 20 MB</small>
+            </label>
+          </div>
+
+          <div id="processing-view" class="processing-view" aria-live="polite" hidden>
+            <span class="spinner" aria-hidden="true"></span>
+            <strong>正在解析种子…</strong>
+            <p id="processing-file-name"></p>
+            <small>计算 Info Hash 并读取 Tracker</small>
+          </div>
+
+          <div id="result-view" hidden>
+            <header class="result-header">
+              <div class="result-heading">
+                <span class="success-icon" aria-hidden="true">✓</span>
+                <div>
+                  <p class="eyebrow">转换完成</p>
+                  <h3 id="source-file-name"></h3>
+                </div>
+              </div>
+              <span id="privacy-badge" class="privacy-badge">本地完成</span>
+            </header>
+
+            <dl class="metadata-grid">
+              <div>
+                <dt>种子名称</dt>
+                <dd id="torrent-name"></dd>
+              </div>
+              <div>
+                <dt>种子类型</dt>
+                <dd id="torrent-kind"></dd>
+              </div>
+              <div>
+                <dt>总大小</dt>
+                <dd id="torrent-size"></dd>
+              </div>
+              <div>
+                <dt>文件数量</dt>
+                <dd id="torrent-file-count"></dd>
+              </div>
+            </dl>
+
+            <section class="hash-panel" aria-labelledby="hash-title">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3 id="hash-title">Info Hash</h3>
+                  <p>根据种子版本计算的内容标识</p>
+                </div>
+              </div>
+              <div id="v1-hash-row" class="hash-row" hidden>
+                <span>v1 · SHA-1</span>
+                <code id="v1-info-hash"></code>
+              </div>
+              <div id="v2-hash-row" class="hash-row" hidden>
+                <span>v2 · SHA-256</span>
+                <code id="v2-info-hash"></code>
+              </div>
+            </section>
+
+            <fieldset class="tracker-panel">
+              <legend class="visually-hidden">Tracker 设置</legend>
+              <div class="section-heading">
+                <div>
+                  <h3>Tracker 设置</h3>
+                  <p id="tracker-summary">选择要写入磁力链接的 Tracker</p>
+                </div>
+                <div id="tracker-actions" class="small-actions">
+                  <button id="select-all-trackers" type="button">全选</button>
+                  <button id="clear-all-trackers" type="button">全部取消</button>
+                </div>
+              </div>
+              <div id="tracker-list" class="tracker-list"></div>
+              <p id="tracker-empty" class="empty-message" hidden>
+                未检测到 Tracker，仍可生成可用的磁力链接。
+              </p>
+              <p id="webseed-summary" class="webseed-summary" hidden></p>
+            </fieldset>
+
+            <section class="magnet-panel" aria-labelledby="magnet-title">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3 id="magnet-title">磁力链接</h3>
+                  <p>Tracker 选择变化后会自动更新</p>
+                </div>
+              </div>
+              <label class="visually-hidden" for="magnet-output">生成的磁力链接</label>
+              <textarea
+                id="magnet-output"
+                rows="5"
+                readonly
+                spellcheck="false"
+                aria-describedby="copy-status"
+              ></textarea>
+              <div class="result-actions">
+                <button id="copy-magnet" class="button button-primary" type="button">
+                  <span aria-hidden="true">⧉</span>
+                  <span id="copy-button-label">复制链接</span>
+                </button>
+                <button id="choose-another" class="button button-secondary" type="button">
+                  转换另一个文件
+                </button>
+              </div>
+              <p id="copy-status" class="copy-status" aria-live="polite"></p>
+            </section>
+          </div>
+        </section>
+
+        <aside class="privacy-note" aria-label="隐私说明">
+          <span class="privacy-symbol" aria-hidden="true">✓</span>
+          <div>
+            <strong>你的文件始终留在设备上</strong>
+            <p>当前页面只读取文件并计算哈希，不会上传、保存或下载任何种子内容。</p>
+          </div>
+        </aside>
+      </main>
+
+      <footer>
+        <span>开源 · 本地处理 · 不记录文件</span>
+        <a
+          href="https://github.com/EnjuYeung/torrentToMagnet"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

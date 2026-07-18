@@ -1,0 +1,44 @@
+{
+  "name": "torrent-to-magnet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "在浏览器本地将 .torrent 文件转换为磁力链接",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "check": "npm run test:coverage && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EnjuYeung/torrentToMagnet.git"
+  },
+  "keywords": [
+    "torrent",
+    "magnet",
+    "bittorrent",
+    "bencode",
+    "docker"
+  ],
+  "author": "EnjuYeung",
+  "license": "MIT",
+  "engines": {
+    "node": "^22.12.0 || >=24.0.0"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
+  }
+}
