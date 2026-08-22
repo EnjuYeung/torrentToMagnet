@@ -10,7 +10,7 @@ COPY src ./src
 
 RUN npm run build
 
-FROM nginxinc/nginx-unprivileged:1.30.4-alpine3.24-slim@sha256:a724e9ad0557e2c6f863573f82a6f86e18d91e420f1efbb12c45f574e48513d2 AS runtime
+FROM nginxinc/nginx-unprivileged:1.31.4-alpine3.24-slim@sha256:f08c8378b2ac3a544e3e9ee664c3efb733b5aa53c774ca4ec8d5d0cc641d9e88 AS runtime
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
