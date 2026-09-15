@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2026-09-15",
+    "macrostructure": "Workbench",
+    "theme": "Terminal",
+    "genre": "atmospheric",
+    "nav": "N8",
+    "footer": "Ft4",
+    "enrichment": "none",
+    "brief": "torrentToMagnet · cyberpunk local conversion",
+    "axes": [
+      "dark",
+      "geometric-sans + mono",
+      "phosphor-green"
+    ],
+    "notes": "Live tool adaptation of Workbench; one page, existing DOM contracts preserved."
+  }
+]

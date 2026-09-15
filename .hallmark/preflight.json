@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-15",
+  "framework": "Vite + TypeScript, vanilla single page",
+  "font": "System sans + system mono (src/style.css:1,517)",
+  "palette": "Light indigo (src/style.css:1)",
+  "motion": "No dependencies (package.json)",
+  "spacing": "mixed raw pixels",
+  "baseline": "0b1486c",
+  "scope": "index.html single-page visual redesign",
+  "preserve": [
+    "DOM ids",
+    "conversion logic",
+    "privacy policy",
+    "Chinese content intent"
+  ],
+  "introduce": [
+    "Terminal theme",
+    "asymmetric live workbench",
+    "local fonts",
+    "named tokens"
+  ]
+}

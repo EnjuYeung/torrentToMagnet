@@ -7,14 +7,14 @@
       name="description"
       content="完全在浏览器本地将 .torrent 种子文件转换为 v1、v2 或 Hybrid 磁力链接。"
     />
-    <meta name="theme-color" content="#f8fafc" />
+    <meta name="theme-color" content="#111613" />
     <title>torrentToMagnet · 种子转磁力链接</title>
   </head>
   <body>
     <div class="page-shell">
       <header class="site-header" aria-label="网站导航">
         <a class="brand" href="/" aria-label="torrentToMagnet 首页">
-          <span class="brand-mark" aria-hidden="true">TM</span>
+          <span class="brand-mark" aria-hidden="true">&gt;_</span>
           <span>torrentToMagnet</span>
         </a>
         <a
@@ -23,19 +23,21 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          查看源码 <span aria-hidden="true">↗</span>
+          GitHub <span aria-hidden="true">↗</span>
         </a>
       </header>
 
       <main>
         <section class="hero" aria-labelledby="page-title">
-          <div class="local-badge"><span aria-hidden="true"></span> 完全本地处理</div>
+          <div class="format-route" aria-hidden="true">
+            <span>.torrent</span><span class="route-arrow"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 5v20h24M23 16l9 9-9 9" /></svg></span><span>magnet<span class="format-colon">:</span></span>
+          </div>
           <h1 id="page-title">把种子文件，<br /><span>变成磁力链接</span></h1>
-          <p>无需上传，所有解析与哈希计算都在你的浏览器中完成。</p>
+          <p>拖入文件，复制链接。<br />所有解析与哈希计算，都在浏览器中完成。</p>
           <ul class="feature-list" aria-label="主要特性">
-            <li>文件不离开设备</li>
-            <li>支持 v1 / v2 / Hybrid</li>
-            <li>无需安装</li>
+            <li><span>支持协议</span><strong>v1 / v2 / Hybrid</strong></li>
+            <li><span>文件上限</span><strong>20 MB / 文件</strong></li>
+            <li><span>处理方式</span><strong>本地解析 · 无需上传</strong></li>
           </ul>
         </section>
 
@@ -45,7 +47,10 @@
           aria-labelledby="converter-title"
           aria-busy="false"
         >
-          <h2 id="converter-title" class="visually-hidden">种子文件转换器</h2>
+          <div class="workbench-heading">
+            <h2 id="converter-title">转换工作台</h2>
+            <span class="local-badge"><span aria-hidden="true"></span> 本地处理</span>
+          </div>
 
           <div id="error-banner" class="error-banner" role="alert" hidden>
             <span class="error-icon" aria-hidden="true">!</span>
@@ -69,11 +74,11 @@
                 aria-label="选择种子文件"
                 aria-describedby="upload-description upload-limit"
               />
-              <span class="upload-symbol" aria-hidden="true">↑</span>
+              <span class="upload-symbol" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M16 6h22l12 12v40H16V6Z"/><path d="M38 6v14h12M25 36l7-7 7 7M32 29v17"/></svg></span>
               <strong id="drop-title">拖入 .torrent 文件</strong>
               <span id="upload-description" class="upload-description">或点击选择文件</span>
               <span class="button button-primary upload-button" aria-hidden="true">选择种子文件</span>
-              <small id="upload-limit">仅支持 .torrent，单个文件不超过 20 MB</small>
+              <small id="upload-limit">支持点击或拖放 · 单个文件 ≤ 20 MB</small>
             </label>
           </div>
 
@@ -89,7 +94,7 @@
               <div class="result-heading">
                 <span class="success-icon" aria-hidden="true">✓</span>
                 <div>
-                  <p class="eyebrow">转换完成</p>
+                  <p class="result-status">转换完成</p>
                   <h3 id="source-file-name"></h3>
                 </div>
               </div>
@@ -168,7 +173,7 @@
               ></textarea>
               <div class="result-actions">
                 <button id="copy-magnet" class="button button-primary" type="button">
-                  <span aria-hidden="true">⧉</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12"/><path d="M16 8V4H4v12h4"/></svg>
                   <span id="copy-button-label">复制链接</span>
                 </button>
                 <button id="choose-another" class="button button-secondary" type="button">
@@ -178,6 +183,7 @@
               <p id="copy-status" class="copy-status" aria-live="polite"></p>
             </section>
           </div>
+          <div class="workbench-foot" aria-hidden="true"><span>.TORRENT → MAGNET URI</span><span>浏览器内完成</span></div>
         </section>
 
         <aside class="privacy-note" aria-label="隐私说明">
@@ -190,13 +196,13 @@
       </main>
 
       <footer>
-        <span>开源 · 本地处理 · 不记录文件</span>
+        <span>torrentToMagnet <span class="footer-divider">/</span> 开源 · 不记录文件</span>
         <a
-          href="https://github.com/EnjuYeung/torrentToMagnet"
+          href="https://github.com/EnjuYeung/torrentToMagnet/blob/main/LICENSE"
           target="_blank"
           rel="noopener noreferrer"
         >
-          GitHub
+          MIT License ↗
         </a>
       </footer>
     </div>

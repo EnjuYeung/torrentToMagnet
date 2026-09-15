@@ -12,7 +12,8 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     baseURL: externalBaseUrl ?? 'http://127.0.0.1:4173',
-    channel: 'chrome',
+    channel: process.env.PLAYWRIGHT_EXECUTABLE_PATH ? undefined : (process.env.PLAYWRIGHT_CHANNEL ?? 'chrome'),
+    launchOptions: { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH },
     trace: 'retain-on-failure',
   },
   projects: [
